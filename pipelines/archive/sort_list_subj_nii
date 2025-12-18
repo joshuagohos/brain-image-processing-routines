@@ -1,0 +1,32 @@
+#!/bin/bash
+# Sort nii files into image type categories needed for project nii
+# preprocessing and write nii lists for each category.
+# - Created by Josh Goh 20251030
+
+# Set environmental paths
+PROJECT_DIR=/home/joshgoh/projects/REP
+DERIVATIVES_DIR=/data/derivatives
+
+# Set nii lists
+T1_list=${PROJECT_DIR}/code/T1_list
+T2_list=${PROJECT_DIR}/code/T2_list
+REP1_list=${PROJECT_DIR}/code/REP1_list
+REP2_list=${PROJECT_DIR}/code/REP2_list
+
+# Loop through subject directories
+for subj in ${PROJECT_DIR}${DERIVATIVES_DIR}/*; do
+	
+	# Write Rep1
+	ls -1 ${subj}/nii/*REP*.nii | sed -n '1p' >> ${REP1_list}
+	
+	# Write Rep2
+	ls -1 ${subj}/nii/*REP*.nii | sed -n '3p' >> ${REP2_list}
+	
+	# Write T1
+	ls -1 ${subj}/nii/*T1*.nii >> ${T1_list}
+	
+	# Write T2
+	ls -1 ${subj}/nii/*t2*.nii >> ${T2_list}
+	
+done
+echo "Done!"

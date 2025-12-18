@@ -1,0 +1,10 @@
+rm -rf ~/projects/REP/data/rawdata/o15/nii/*REP*_23.*
+rm -rf ~/projects/REP/data/rawdata/o15/nii/*REP*_25.*
+rm -rf ~/projects/REP/data/rawdata/o15/nii/*T1*_13.*
+rm -rf ~/projects/REP/data/rawdata/o15/nii/o15_REP2_150BR_32_sl_MoCo_20080506140515_27.*
+rm -rf ~/projects/REP/data/rawdata/o15/nii/o15_t2_tse_tra_32slice,pre-epi_20080130101823_22.*
+rm -rf ~/projects/REP/data/derivatives/o15/nii/*REP*_23.*
+rm -rf ~/projects/REP/data/derivatives/o15/nii/*REP*_25.*
+rm -rf ~/projects/REP/data/derivatives/o15/nii/*T1*_13.*
+rm -rf ~/projects/REP/data/derivatives/o15/nii/o15_REP2_150BR_32_sl_MoCo_20080506140515_27.*
+rm -rf ~/projects/REP/data/derivatives/o15/nii/o15_t2_tse_tra_32slice,pre-epi_20080130101823_22.*
