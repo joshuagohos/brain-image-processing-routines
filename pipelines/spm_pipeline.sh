@@ -293,7 +293,7 @@ if [[ "$SUBJ_LEVEL_STATS" == "yes" ]]; then
 			ls -1 ${PROJECT_DIR}/data/sourcedata/${subj}/beh/*_soa.mat >> ${SOA_LIST}
 			spm_eval_stats_lists ${STUDY_SPECIFIC_MAKE_LVL1_CON_LIST_SCRIPT} ${SOA_LIST} ${CONTYPE_LIST} ${CONNAME_LIST} ${CONVEC_LIST}
 			spm_stats_con ${RESULTS_DIR}/SPM.mat ${CONTYPE_LIST} ${CONNAME_LIST} ${CONVEC_LIST} ${LVL1_STATS_DELETE_CONS} ${subj}_spm_lvl1_con 1
-			rm -rf ${SOA_LIST} ${CONVEC_LIST} ${CONNAME_LIST} ${CONVEC_LIST}
+			rm -rf ${SOA_LIST} ${CONTYPE_LIST} ${CONVEC_LIST} ${CONNAME_LIST} ${CONVEC_LIST}
 			echo "${subj} level 1 contrasts done."
 		fi		
 	done
@@ -318,7 +318,7 @@ if [[ "$GROUP_LEVEL_STATS" == "yes" ]]; then
 		rm -rf ${FACTOR_LIST} ${FACTOR_LEVELS_LIST} ${FACTOR_DEP_LIST} ${FACTOR_VAR_LIST} ${CELL_LEVELS_LIST} ${CELL_CON_FILES_LIST}
 		spm_eval_stats_lists ${STUDY_SPECIFIC_MAKE_LVL2_SPEC_LIST_SCRIPT} ${FACTOR_LIST} ${FACTOR_LEVELS_LIST} ${FACTOR_DEP_LIST} ${FACTOR_VAR_LIST} ${CELL_LEVELS_LIST} ${CELL_CON_FILES_LIST} 
 		spm_lvl2_spec ${GRP_RESULTS_DIR} ${FACTOR_LIST} ${FACTOR_LEVELS_LIST} ${FACTOR_DEP_LIST} ${FACTOR_VAR_LIST} ${CELL_LEVELS_LIST} ${CELL_CON_FILES_LIST} ${GROUP_NAME}_spm_lvl2_spec 0
-		#rm -rf ${FACTOR_LIST} ${FACTOR_LEVELS_LIST} ${FACTOR_DEP_LIST} ${FACTOR_VAR_LIST} ${CELL_LEVELS_LIST} ${CELL_CON_FILES_LIST}
+		rm -rf ${FACTOR_LIST} ${FACTOR_LEVELS_LIST} ${FACTOR_DEP_LIST} ${FACTOR_VAR_LIST} ${CELL_LEVELS_LIST} ${CELL_CON_FILES_LIST}
 		echo "Group level full factorial specification done."
 	fi
 	
@@ -340,7 +340,7 @@ if [[ "$GROUP_LEVEL_STATS" == "yes" ]]; then
 		rm -rf ${CONTYPE_LIST} ${CONVEC_LIST} ${CONNAME_LIST} ${CONVEC_LIST}
 		spm_eval_stats_lists ${STUDY_SPECIFIC_MAKE_LVL2_CON_LIST_SCRIPT} ${CONTYPE_LIST} ${CONNAME_LIST} ${CONVEC_LIST}
 		spm_stats_con ${GRP_RESULTS_DIR}/SPM.mat ${CONTYPE_LIST} ${CONNAME_LIST} ${CONVEC_LIST} ${LVL2_STATS_DELETE_CONS} ${GROUP_NAME}_spm_lvl2_con 0
-		#rm -rf ${CONVEC_LIST} ${CONNAME_LIST} ${CONVEC_LIST}
+		rm -rf ${CONTYPE_LIST} ${CONNAME_LIST} ${CONVEC_LIST}
 		echo "${subj} level 2 contrasts done."
 		
 	fi
