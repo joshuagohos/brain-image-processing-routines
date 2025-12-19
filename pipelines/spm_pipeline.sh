@@ -226,7 +226,7 @@ if [[ "$GROUP_LEVEL_PREPROC" == "yes" ]]; then
 			IMAGE_FILES=(${DERIVATIVES_DIR}/${subj}/nii/ar${EPI_FILENAME_GLOB}.nii)
 			echo ${IMAGE_FILES[*]} >> ${DERIVATIVES_DIR}/SST/IMAGE_FILE_LIST.txt
 		done
-		spm_normalise-sst-mni ${DERIVATIVES_DIR}/SST/Template_6.nii ${DERIVATIVES_DIR}/SST/FLOW_FIELD_LIST.txt ${DERIVATIVES_DIR}/SST/IMAGE_FILE_LIST.txt ${SMOOTH_KERNEL} ${DERIVATIVES_DIR}/SST/spm_normalise_epi_sst-mni 1
+		spm_normalise-sst-mni ${DERIVATIVES_DIR}/SST/Template_6.nii ${DERIVATIVES_DIR}/SST/FLOW_FIELD_LIST.txt ${DERIVATIVES_DIR}/SST/IMAGE_FILE_LIST.txt ${NORM_RESAMPLING} ${SMOOTH_KERNEL} ${DERIVATIVES_DIR}/SST/spm_normalise_epi_sst-mni 1
 		rm -rf ${DERIVATIVES_DIR}/SST/FLOW_FIELD_LIST.txt ${DERIVATIVES_DIR}/SST/IMAGE_FILE_LIST.txt
 		echo "EPI to SST to MNI normalisation and smoothing done"
 	fi
