@@ -20,6 +20,8 @@ SEGMENT_AFF_REG=mni # Alt: mni | eastern | subj | none | 0
 NORM_RESAMPLING=3,3,3
 SMOOTH_KERNEL=8,8,8
 rc_GLOBS=("rc1" "rc2" "rc3" "rc4" "rc5" "rc6")
+LVL1_EPI_INPUT_PREFIX=swar
+LVL1_REGLIST_GLOB=rp*.txt
 LVL1_STATS_UNITS=secs
 LVL1_STATS_TR=2
 LVL1_STATS_MICROTIME_RES=32
@@ -269,11 +271,11 @@ if [[ "$SUBJ_LEVEL_STATS" == "yes" ]]; then
 				
 			echo "Working on ${subj} level 1 stats specification."
 			EPI_DATA_LIST=${DERIVATIVES_DIR}/${subj}/nii/EPI_DATA_LIST.txt
-			ls -1 ${DERIVATIVES_DIR}/${subj}/nii/swar${EPI_FILENAME_GLOB}.nii >> ${EPI_DATA_LIST}
+			ls -1 ${DERIVATIVES_DIR}/${subj}/nii/${LVL1_EPI_INPUT_PREFIX}${EPI_FILENAME_GLOB}.nii >> ${EPI_DATA_LIST}
 			SOA_LIST=${DERIVATIVES_DIR}/${subj}/nii/SOA_LIST.txt
 			ls -1 ${PROJECT_DIR}/data/sourcedata/${subj}/beh/*_soa.mat >> ${SOA_LIST}
 			REG_LIST=${DERIVATIVES_DIR}/${subj}/nii/REG_LIST.txt
-			ls -1 ${DERIVATIVES_DIR}/${subj}/nii/rp*.txt >> ${REG_LIST}
+			ls -1 ${DERIVATIVES_DIR}/${subj}/nii/${LVL1_REGLIST_GLOB} >> ${REG_LIST}
 			spm_lvl1_spec ${EPI_DATA_LIST} ${SOA_LIST} ${REG_LIST} ${RESULTS_DIR} ${LVL1_STATS_UNITS} ${LVL1_STATS_TR} ${LVL1_STATS_MICROTIME_RES} ${LVL1_STATS_MICROTIME_ONSET} "${LVL1_MASK}" ${LVL1_MASK_THRESH} ${subj}_spm_lvl1_spec 1
 			rm -rf ${EPI_DATA_LIST} ${SOA_LIST} ${REG_LIST}
 			echo "${subj} level 1 specification done."
