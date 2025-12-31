@@ -172,7 +172,7 @@ sudo chmod -R +x /opt/brain-processing-routines/routines/*
 4. Make read/write/executable and copy the contents (symbolic links) of the bin folder to /usr/local/bin/.
 ```
 sudo chmod +rwx brain-processing-routines/bin/*
-sudo cp -rf brain-processing-routines/bin/* /usr/local/bin/
+sudo cp -rf brain-image-processing-routines/bin/* /usr/local/bin/
 ```
 
 # Usage
