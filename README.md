@@ -169,10 +169,10 @@ sudo cp -rf brain-image-processing-routines/routines /opt/brain-processing-routi
 sudo chmod -R +x /opt/brain-image-processing-routines/routines/*
 ```
 
-4. Make read/write/executable and copy the contents (symbolic links) of the bin folder to /usr/local/bin/.
+4. Make read/write/executable and copy (using rsync) the contents (symbolic links) of the bin folder to /usr/local/bin/.
 ```
 sudo chmod +rwx brain-image-processing-routines/bin/*
-sudo cp -rf brain-image-processing-routines/bin/* /usr/local/bin/
+sudo rsync -azvh brain-image-processing-routines/bin/* /usr/local/bin/
 ```
 
 # Usage
