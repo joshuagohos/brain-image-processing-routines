@@ -159,7 +159,7 @@ brain-processing-routines
 └── routines
 ```
 - bin: symbolic links pointing to shell scripts in the routines directory. The contents in this folder should be copied to /usr/local/bin/
-- pipelines: Control shell scripts that call routines scripts in the routine directory. These scripts should be placed in specific project code or script folders and modified for use accordingly.
+- pipelines: Control shell scripts that call routines scripts in the routine directory. These pipeline and specs (sub-folder) scripts should be placed in specific project code or script folders and modified for use accordingly.
 - routines: Bash shell wrappers scripts passing brain processing functions into respective coding environments.
 
 3. Copy the routines folder to /opt/brain-processing-routines/ and make executable.
