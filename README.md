@@ -142,16 +142,16 @@ sudo chmod +x /etc/profile.d/freesurfer.sh
 1. Download this repository to your local path (e.g. /home/user)
 ```
 cd ~
-wget https://github.com/joshuagohos/brain-processing-routines/archive/refs/heads/main.zip
+wget https://github.com/joshuagohos/brain-image-processing-routines/archive/refs/heads/main.zip
 ```
 
 2. Unzip the downloaded zip file.
 ```
 unzip main.zip
 ```
-This will results in a folder named brain-processing-routines. The folder contains the following:
+This will results in a folder named brain-image-processing-routines. The folder contains the following:
 ```
-brain-processing-routines
+brain-image-processing-routines
 ├── LICENSE
 ├── README.md
 ├── bin
@@ -162,23 +162,23 @@ brain-processing-routines
 - pipelines: Control shell scripts that call routines scripts in the routine directory. These pipeline and specs (sub-folder) scripts should be placed in specific project code or script folders and modified for use accordingly.
 - routines: Bash shell wrappers scripts passing brain processing functions into respective coding environments.
 
-3. Copy the routines folder to /opt/brain-processing-routines/ and make executable.
+3. Copy the routines folder to /opt/brain-image-processing-routines/ and make executable.
 ```
-sudo mkdir -p /opt/brain-processing-routines
-sudo cp -rf brain-processing-routines/routines /opt/brain-processing-routines/
-sudo chmod -R +x /opt/brain-processing-routines/routines/*
+sudo mkdir -p /opt/brain-image-processing-routines
+sudo cp -rf brain-image-processing-routines/routines /opt/brain-processing-routines/
+sudo chmod -R +x /opt/brain-image-processing-routines/routines/*
 ```
 
 4. Make read/write/executable and copy the contents (symbolic links) of the bin folder to /usr/local/bin/.
 ```
-sudo chmod +rwx brain-processing-routines/bin/*
+sudo chmod +rwx brain-image-processing-routines/bin/*
 sudo cp -rf brain-image-processing-routines/bin/* /usr/local/bin/
 ```
 
 # Usage
-Configure the pipeline scripts in brain-processing-routines/pipelines as needed and run. For example, after. configuring task-activity_pipeline.sh, run the following.
+Configure the pipeline scripts in brain-image-processing-routines/pipelines as needed and run. For example, after. configuring task-activity_pipeline.sh, run the following.
 ```
-cd /path/to/project/brain-processing-routines/pipelines
+cd /path/to/project/brain-image-processing-routines/pipelines
 ./task-activity_pipelines.sh
 ```
 
