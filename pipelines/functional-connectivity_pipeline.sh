@@ -15,13 +15,16 @@ REALIGN_TO_MEAN=1 # 1: Register to first
 SLICE_TIME_SLICE_ORDER="eval('[2:2:nslices,1:2:nslices]')"
 SLICE_TIME_REF_SLICE=2 # If SLICE_TIME_SLICE_ORDER is in ms, then this is in ms.
 SLICE_TIME_TIME_ACQUISITION="eval('tr-(tr/nslices)')" # If SLICE_TIME_SLICE_ORDER is in ms, then this is 0.
+SLICE_TO_SLICE="eval('tr/nslices')"
 COREG_OTHER=0
 SEGMENT_AFF_REG=mni # Alt: mni | eastern | subj | none | 0 
+DENOISE_MASK_THRESHOLD=0.95
 NORM_RESAMPLING=3,3,3
 SMOOTH_KERNEL=8,8,8
 rc_GLOBS=("rc1" "rc2" "rc3" "rc4" "rc5" "rc6")
 LVL1_EPI_INPUT_PREFIX=swar
 LVL1_REGLIST_GLOB=rp*.txt
+LVL1_DENOISE_REGLIST_GLOB=multiple_regressors_epi*.txt
 LVL1_STATS_UNITS=secs
 LVL1_STATS_TR=2
 LVL1_STATS_MICROTIME_RES=32
@@ -47,6 +50,7 @@ SLICE_TIME_CORRECTION="no"
 COREG_T2_EPI="no"
 COREG_T1_T2="no"
 SEGMENT_T1="no"
+DENOISE_EPI="no"
 NORMALISE_EPI_MNI="no"
 SMOOTH_EPI="no"
 
@@ -159,6 +163,19 @@ if [[ "$SUBJ_LEVEL_PREPROC" == "yes" ]]; then
 			echo "Working on ${subj} T1 segmentation."
 			spm_segment ${T1_DATA_VOL} ${SEGMENT_AFF_REG} ${subj}_spm_segment 1
 			echo "${subj} T1 segmentation done."
+		fi
+
+		# Extract denoising physiological parameters (runs PhysIO module)
+		if [[ "${DENOISE_EPI}" == "yes" ]]; then
+			echo "Working on ${subj} EPI denoising parameter extraction."
+			ls -1 ${DERIVATIVES_DIR}/${subj}/nii/ar${EPI_FILENAME_GLOB}.nii >> ${EPI_DATA_LIST}
+			WM_MASK=${DERIVATIVES_DIR}/$subj/nii/c2*.nii
+			CSF_MASK=${DERIVATIVES_DIR}/$subj/nii/c3*.nii
+			REG_LIST=${DERIVATIVES_DIR}/${subj}/nii/REG_LIST.txt
+			ls -1 ${DERIVATIVES_DIR}/${subj}/nii/${LVL1_REGLIST_GLOB} >> ${REG_LIST}
+			spm_denoise_physio ${DERIVATIVES_DIR}/${subj}/nii ${EPI_DATA_LIST} ${LVL1_STATS_TR} ${SLICE_TIME_REF_SLICE} ${SLICE_TO_SLICE} ${WM_MASK} ${CSF_MASK} ${DENOISE_MASK_THRESHOLD} ${REG_LIST} ${subj}_spm_denoise_EPI
+			rm -rf ${EPI_DATA_LIST} ${REG_LIST}
+			echo "${subj} EPI denoising parameter extraction done."
 		fi
 		
 		# Normalise EPI to MNI
