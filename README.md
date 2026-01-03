@@ -1,5 +1,5 @@
 # Brain Image Processing Routines
-*Updated 202512301530 by Josh Goh*
+*Updated 20260103 by Josh Goh*
 
 ## OVERVIEW
 Currently, 
