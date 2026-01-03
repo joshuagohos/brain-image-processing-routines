@@ -49,13 +49,12 @@ matlab -nosplash > matlab.out << EOF
         nrun = size(S,1);
     end
     mask(1).vol = '${wm_mask}';
-    mask(2).vol = '${csf_mask}'; 
+    mask(2).vol = '${csf_mask}';
+    tr=${tr};
     for r = 1:nrun,
         ni = niftiinfo(S{r});
         nvols = ni.ImageSize(4);
-        for t = 1:nvols,
-            temp(t).epivol = [deblank(S{r}) ',' num2str(t)];
-        end;
+        nslices=ni.ImageSize(3);
         matlabbatch{1}.spm.tools.physio.log_files.vendor = 'Philips';
         matlabbatch{1}.spm.tools.physio.log_files.cardiac = {''};
         matlabbatch{1}.spm.tools.physio.log_files.respiration = {''};
@@ -63,9 +62,9 @@ matlab -nosplash > matlab.out << EOF
         matlabbatch{1}.spm.tools.physio.log_files.sampling_interval = [];
         matlabbatch{1}.spm.tools.physio.log_files.relative_start_acquisition = 0;
         matlabbatch{1}.spm.tools.physio.log_files.align_scan = 'last';
-        matlabbatch{1}.spm.tools.physio.scan_timing.sqpar.Nslices = ni.ImageSize(3);
+        matlabbatch{1}.spm.tools.physio.scan_timing.sqpar.Nslices = nslices;
         matlabbatch{1}.spm.tools.physio.scan_timing.sqpar.NslicesPerBeat = [];
-        matlabbatch{1}.spm.tools.physio.scan_timing.sqpar.TR = ${tr};
+        matlabbatch{1}.spm.tools.physio.scan_timing.sqpar.TR = tr;
         matlabbatch{1}.spm.tools.physio.scan_timing.sqpar.Ndummies = 0;
         matlabbatch{1}.spm.tools.physio.scan_timing.sqpar.Nscans = nvols;
         matlabbatch{1}.spm.tools.physio.scan_timing.sqpar.onset_slice = ${refslice};
@@ -80,14 +79,14 @@ matlab -nosplash > matlab.out << EOF
         matlabbatch{1}.spm.tools.physio.preproc.cardiac.posthoc_cpulse_select.off = struct([]);
         matlabbatch{1}.spm.tools.physio.preproc.respiratory.filter.passband = [0.01 2];
         matlabbatch{1}.spm.tools.physio.preproc.respiratory.despike = false;
-        matlabbatch{1}.spm.tools.physio.model.output_multiple_regressors = ['multiple_regressors_epi' str2num(r) '.txt'];
-        matlabbatch{1}.spm.tools.physio.model.output_physio = ['physio_epi' str2num(r) '.mat'];
+        matlabbatch{1}.spm.tools.physio.model.output_multiple_regressors = ['multiple_regressors_epi' num2str(r) '.txt'];
+        matlabbatch{1}.spm.tools.physio.model.output_physio = ['physio_epi' num2str(r) '.mat'];
         matlabbatch{1}.spm.tools.physio.model.orthogonalise = 'none';
         matlabbatch{1}.spm.tools.physio.model.censor_unreliable_recording_intervals = false;
         matlabbatch{1}.spm.tools.physio.model.retroicor.no = struct([]);
         matlabbatch{1}.spm.tools.physio.model.rvt.no = struct([]);
         matlabbatch{1}.spm.tools.physio.model.hrv.no = struct([]);
-        matlabbatch{1}.spm.tools.physio.model.noise_rois.yes.fmri_files = cellstr(strvcat(temp.epivol));
+        matlabbatch{1}.spm.tools.physio.model.noise_rois.yes.fmri_files = {deblank(S{r})};
         matlabbatch{1}.spm.tools.physio.model.noise_rois.yes.roi_files = cellstr(strvcat(mask.vol));
         matlabbatch{1}.spm.tools.physio.model.noise_rois.yes.force_coregister = 'Yes';
         matlabbatch{1}.spm.tools.physio.model.noise_rois.yes.thresholds = ${mask_threshold};
@@ -99,29 +98,10 @@ matlab -nosplash > matlab.out << EOF
         matlabbatch{1}.spm.tools.physio.model.movement.yes.censoring_threshold = 0.5;
         matlabbatch{1}.spm.tools.physio.model.other.no = struct([]);
         matlabbatch{1}.spm.tools.physio.verbose.level = 1;
-        matlabbatch{1}.spm.tools.physio.verbose.fig_output_file = ['physio_output_figure_epi' str2num(r) '.ps'];
+        matlabbatch{1}.spm.tools.physio.verbose.fig_output_file = [];
         matlabbatch{1}.spm.tools.physio.verbose.use_tabs = false;
 
-        matlabbatch{2}.spm.stats.fmri_spec.dir = {[PATH_AXC_RES_TW_Nifti 'sub-' num2str(subj) '/First_level']};
-        matlabbatch{2}.spm.stats.fmri_spec.timing.units = 'secs';
-        matlabbatch{2}.spm.stats.fmri_spec.timing.RT = 0.65;
-        matlabbatch{2}.spm.stats.fmri_spec.timing.fmri_t = 64;
-        matlabbatch{2}.spm.stats.fmri_spec.timing.fmri_t0 = 1;
-        matlabbatch{2}.spm.stats.fmri_spec.sess.scans = EPI{1,1}(1:626,1);
-        matlabbatch{2}.spm.stats.fmri_spec.sess.cond = struct('name', {}, 'onset', {}, 'duration', {}, 'tmod', {}, 'pmod', {}, 'orth', {});
-        matlabbatch{2}.spm.stats.fmri_spec.sess.multi = {''};
-        matlabbatch{2}.spm.stats.fmri_spec.sess.regress = struct('name', {}, 'val', {});
-        matlabbatch{2}.spm.stats.fmri_spec.sess.multi_reg(1) = cfg_dep('TAPAS PhysIO Toolbox: physiological noise regressors file (Multiple Regressors)', substruct('.','val', '{}',{1}, '.','val', '{}',{1}, '.','val', '{}',{1}), substruct('.','physnoisereg'));
-        matlabbatch{2}.spm.stats.fmri_spec.sess.hpf = 128;
-        matlabbatch{2}.spm.stats.fmri_spec.fact = struct('name', {}, 'levels', {});
-        matlabbatch{2}.spm.stats.fmri_spec.bases.hrf.derivs = [0 0];
-        matlabbatch{2}.spm.stats.fmri_spec.volt = 1;
-        matlabbatch{2}.spm.stats.fmri_spec.global = 'None';
-        matlabbatch{2}.spm.stats.fmri_spec.mthresh = 0.8;
-        matlabbatch{2}.spm.stats.fmri_spec.mask = {''};
-        matlabbatch{2}.spm.stats.fmri_spec.cvi = 'AR(1)';
-
-        save([]'${mbfn}_epi' str2num(r)],'matlabbatch');
+        save([]'${mbfn}_epi' num2str(r)],'matlabbatch');
         spm_jobman('run',matlabbatch);
     end
 exit;
