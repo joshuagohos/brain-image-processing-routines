@@ -39,6 +39,9 @@ unset DISPLAY
 matlab -nosplash > matlab.out << EOF
     settings;
     matlabbatch{1}.spm.tools.physio.save_dir = {'${output_dir}'};
+    matlabbatch{1}.spm.tools.physio.write_bids.bids_step = 0;
+    matlabbatch{1}.spm.tools.physio.write_bids.bids_dir = {''};
+    matlabbatch{1}.spm.tools.physio.write_bids.bids_prefix = 'sub-control01_task-YOURTASK_run-1';
     REG = readlines('${regdat}','EmptyLineRule','skip');
     [p n e] = fileparts('${inputdat}');
     if strcmp(e,'.nii'),
@@ -98,8 +101,8 @@ matlab -nosplash > matlab.out << EOF
         matlabbatch{1}.spm.tools.physio.model.movement.yes.censoring_threshold = 0.5;
         matlabbatch{1}.spm.tools.physio.model.other.no = struct([]);
         matlabbatch{1}.spm.tools.physio.verbose.level = 1;
-        matlabbatch{1}.spm.tools.physio.verbose.fig_output_file = [];
-        matlabbatch{1}.spm.tools.physio.verbose.use_tabs = false;
+        matlabbatch{1}.spm.tools.physio.verbose.fig_output_file = '';
+        matlabbatch{1}.spm.tools.physio.verbose.use_tabs = 0;
 
         save([]'${mbfn}_epi' num2str(r)],'matlabbatch');
         spm_jobman('run',matlabbatch);

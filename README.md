@@ -30,6 +30,7 @@ sudo ln -s /opt/MRIcroGL/Resources/dcm2niix dcm2niix
 
 **2. Matlab**
 - This should be downloaded from [MathWorks](https://www.mathworks.com) using your Mathworks account and installed as instructed on their website.
+- The matlab installation must include the image processing toolbox and the statistics and machine learning toolbox.
 - The 'matlab' function then needs to be in the system search path.
 - Here is a sample installation script after the installation zip file has been downloaded and unzipped (e.g. to the ~/Downloads/matlab_R2025b_Linux folder).
 ```
