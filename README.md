@@ -177,9 +177,9 @@ sudo rsync -azvh brain-image-processing-routines/bin/* /usr/local/bin/
 ```
 
 # Usage
-Configure the pipeline scripts in brain-image-processing-routines/pipelines as needed and run. For example, after. configuring task-activity_pipeline.sh, run the following.
+Configure the pipeline scripts in brain-image-processing-routines/pipelines as needed and run. For example, after. configuring pipeline.sh, run the following.
 ```
 cd /path/to/project/brain-image-processing-routines/pipelines
-./task-activity_pipelines.sh
+./pipeline.sh
 ```
 
