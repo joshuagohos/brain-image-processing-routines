@@ -97,7 +97,7 @@ matlab -nosplash > matlab.out << EOF
         matlabbatch{1}.spm.tools.physio.model.noise_rois.yes.n_components = 5;
         matlabbatch{1}.spm.tools.physio.model.movement.yes.file_realignment_parameters = {deblank(REG{r})};
         matlabbatch{1}.spm.tools.physio.model.movement.yes.order = 24;
-        matlabbatch{1}.spm.tools.physio.model.movement.yes.censoring_method = 'none';
+        matlabbatch{1}.spm.tools.physio.model.movement.yes.censoring_method = 'FD';
         matlabbatch{1}.spm.tools.physio.model.movement.yes.censoring_threshold = 0.5;
         matlabbatch{1}.spm.tools.physio.model.other.no = struct([]);
         matlabbatch{1}.spm.tools.physio.verbose.level = 1;
