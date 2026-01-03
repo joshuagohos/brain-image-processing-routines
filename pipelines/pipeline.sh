@@ -11,6 +11,7 @@ T1_FILENAME_GLOB=*T1*.nii
 T2_FILENAME_GLOB=*t2*.nii
 UNWANTED_FILENAME_GLOBS=("*REP*MoCo*.*")
 STUDY_SPECIFIC_OTHER_CLEANUP_SCRIPT=${PROJECT_DIR}/code/pipelines/specs/spm_pipeline_other_cleanup.sh
+EPI_TR=2
 REALIGN_TO_MEAN=1 # 1: Register to first
 REALIGN_PARAMS_GLOB=rp*.txt
 SLICE_TIME_SLICE_ORDER="eval('[2:2:nslices,1:2:nslices]')"
@@ -27,7 +28,6 @@ rc_GLOBS=("rc1" "rc2" "rc3" "rc4" "rc5" "rc6")
 LVL1_EPI_INPUT_PREFIX=ar
 LVL1_DENOISE_PARAMS_GLOB=multiple_regressors_epi*.txt
 LVL1_STATS_UNITS=secs
-LVL1_STATS_TR=2
 LVL1_STATS_MICROTIME_RES=32
 LVL1_STATS_MICROTIME_ONSET=2
 LVL1_MASK_THRESH=0.8
@@ -65,6 +65,7 @@ SUBJ_LEVEL_STATS="no"
 LVL1_SPEC="no"
 LVL1_EST="no"
 LVL1_CON="no"
+LVL1_MERGE_RES="no"
 
 GROUP_LEVEL_STATS="no"
 LVL2_SPEC="no"
@@ -181,7 +182,7 @@ if [[ "$SUBJ_LEVEL_PREPROC" == "yes" ]]; then
 			CSF_MASK=${DERIVATIVES_DIR}/$subj/nii/c3*.nii
 			REG_LIST=${DERIVATIVES_DIR}/${subj}/nii/REG_LIST.txt
 			ls -1 ${DERIVATIVES_DIR}/${subj}/nii/${REALIGN_PARAMS_GLOB} >> ${REG_LIST}
-			spm_denoise_physio ${DERIVATIVES_DIR}/${subj}/nii ${EPI_DATA_LIST} ${LVL1_STATS_TR} ${SLICE_TIME_REF_SLICE} ${SLICE_TO_SLICE} ${WM_MASK} ${CSF_MASK} ${DENOISE_MASK_THRESHOLD} ${REG_LIST} ${subj}_spm_denoise_EPI
+			spm_denoise_physio ${DERIVATIVES_DIR}/${subj}/nii ${EPI_DATA_LIST} ${EPI_TR} ${SLICE_TIME_REF_SLICE} ${SLICE_TO_SLICE} ${WM_MASK} ${CSF_MASK} ${DENOISE_MASK_THRESHOLD} ${REG_LIST} ${subj}_spm_denoise_EPI
 			rm -rf ${EPI_DATA_LIST} ${REG_LIST}
 			echo "${subj} EPI denoising parameter extraction done."
 		fi
@@ -301,7 +302,7 @@ if [[ "$SUBJ_LEVEL_STATS" == "yes" ]]; then
 			ls -1 ${PROJECT_DIR}/data/sourcedata/${subj}/beh/*_soa.mat >> ${SOA_LIST}
 			REG_LIST=${DERIVATIVES_DIR}/${subj}/nii/REG_LIST.txt
 			ls -1 ${DERIVATIVES_DIR}/${subj}/nii/${LVL1_DENOISE_PARAMS_GLOB} >> ${REG_LIST}
-			spm_lvl1_spec ${EPI_DATA_LIST} ${SOA_LIST} ${REG_LIST} ${RESULTS_DIR} ${LVL1_STATS_UNITS} ${LVL1_STATS_TR} ${LVL1_STATS_MICROTIME_RES} ${LVL1_STATS_MICROTIME_ONSET} "${LVL1_MASK}" ${LVL1_MASK_THRESH} ${subj}_spm_lvl1_spec 1
+			spm_lvl1_spec ${EPI_DATA_LIST} ${SOA_LIST} ${REG_LIST} ${RESULTS_DIR} ${LVL1_STATS_UNITS} ${EPI_TR} ${LVL1_STATS_MICROTIME_RES} ${LVL1_STATS_MICROTIME_ONSET} "${LVL1_MASK}" ${LVL1_MASK_THRESH} ${subj}_spm_lvl1_spec 1
 			rm -rf ${EPI_DATA_LIST} ${SOA_LIST} ${REG_LIST}
 			echo "${subj} level 1 specification done."
 		fi
@@ -331,6 +332,12 @@ if [[ "$SUBJ_LEVEL_STATS" == "yes" ]]; then
 		fi
 
 		# MERGE RESIDUALS
+		if [[ ${LVL1_MERGE_RES} == "yes" ]]; then
+
+			echo "Working on ${subj} level 1 merge residuals."
+			
+			echo "${subj} level 1 merge residuals done."
+		fi
 
 		# DETREND
 
