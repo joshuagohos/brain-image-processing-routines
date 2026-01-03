@@ -12,6 +12,7 @@ T2_FILENAME_GLOB=*t2*.nii
 UNWANTED_FILENAME_GLOBS=("*REP*MoCo*.*")
 STUDY_SPECIFIC_OTHER_CLEANUP_SCRIPT=${PROJECT_DIR}/code/pipelines/specs/spm_pipeline_other_cleanup.sh
 EPI_TR=2
+NVOLS_RUN=("150" "150")
 REALIGN_TO_MEAN=1 # 1: Register to first
 REALIGN_PARAMS_GLOB=rp*.txt
 SLICE_TIME_SLICE_ORDER="eval('[2:2:nslices,1:2:nslices]')"
@@ -21,6 +22,8 @@ SLICE_TO_SLICE="eval('tr/nslices')"
 COREG_OTHER=0
 SEGMENT_AFF_REG=mni # Alt: mni | eastern | subj | none | 0 
 DENOISE_MASK_THRESHOLD=0.95
+DENOISE_CENSOR_METHOD=None # Alt: None | FD
+DENOISE_CENSOR_THRESHOLD=0.5 # If FD, 0.5 mm
 NORM_RESAMPLING=3,3,3
 SMOOTH_KERNEL=8,8,8
 rc_GLOBS=("rc1" "rc2" "rc3" "rc4" "rc5" "rc6")
@@ -32,8 +35,11 @@ LVL1_STATS_MICROTIME_RES=32
 LVL1_STATS_MICROTIME_ONSET=2
 LVL1_MASK_THRESH=0.8
 LVL1_MASK=""
-LVL1_STATS_RESIDUALS=1 # 1: Save, 0: Do not save 
 LVL1_STATS_DELETE_CONS=1 # 1: Delete, 0: Do not delete 
+LVL1_STATS_RESIDUALS=1 # 1: Save, 0: Do not save
+LVL1_RESIDUALS_FILENAME_PREFIX=Res_
+LVL1_RESIDUALS_LOW_F=0.01
+LVL1_RESIDUALS_HIGH_F=0.1
 STUDY_SPECIFIC_MAKE_LVL1_CON_LIST_SCRIPT=${PROJECT_DIR}/code/pipelines/specs/spm_make_lvl1_con_lists.sh # Be sure to check this file
 STUDY_SPECIFIC_MAKE_LVL2_SPEC_LIST_SCRIPT=${PROJECT_DIR}/code/pipelines/specs/bash_make_spm_lvl2_spec_lists.sh # Be sure to check this file
 STUDY_SPECIFIC_MAKE_LVL2_CON_LIST_SCRIPT=${PROJECT_DIR}/code/pipelines/specs/bash_make_spm_lvl2_con_lists.sh # Be sure to check this file
@@ -65,7 +71,7 @@ SUBJ_LEVEL_STATS="no"
 LVL1_SPEC="no"
 LVL1_EST="no"
 LVL1_CON="no"
-LVL1_MERGE_RES="no"
+LVL1_MERGE_RESISDUALS="no"
 
 GROUP_LEVEL_STATS="no"
 LVL2_SPEC="no"
@@ -129,6 +135,9 @@ if [[ "$SUBJ_LEVEL_PREPROC" == "yes" ]]; then
 		# Inhomogeneity correction
 		if [[ "${INHOMOGENEITY_CORRECTION}" == "yes" ]]; then
 			echo "Working on ${subj} inhomogeneity correction."
+
+
+
 			echo "${subj} inhomogeneity correction done."
 		fi
 
@@ -182,7 +191,7 @@ if [[ "$SUBJ_LEVEL_PREPROC" == "yes" ]]; then
 			CSF_MASK=${DERIVATIVES_DIR}/$subj/nii/c3*.nii
 			REG_LIST=${DERIVATIVES_DIR}/${subj}/nii/REG_LIST.txt
 			ls -1 ${DERIVATIVES_DIR}/${subj}/nii/${REALIGN_PARAMS_GLOB} >> ${REG_LIST}
-			spm_denoise_physio ${DERIVATIVES_DIR}/${subj}/nii ${EPI_DATA_LIST} ${EPI_TR} ${SLICE_TIME_REF_SLICE} ${SLICE_TO_SLICE} ${WM_MASK} ${CSF_MASK} ${DENOISE_MASK_THRESHOLD} ${REG_LIST} ${subj}_spm_denoise_EPI
+			spm_denoise_physio ${DERIVATIVES_DIR}/${subj}/nii ${EPI_DATA_LIST} ${EPI_TR} ${SLICE_TIME_REF_SLICE} ${SLICE_TO_SLICE} ${WM_MASK} ${CSF_MASK} ${DENOISE_MASK_THRESHOLD} ${REG_LIST} ${DENOISE_CENSOR_METHOD} ${DENOISE_CENSOR_THRESHOLD} ${subj}_spm_denoise_EPI
 			rm -rf ${EPI_DATA_LIST} ${REG_LIST}
 			echo "${subj} EPI denoising parameter extraction done."
 		fi
@@ -274,7 +283,7 @@ if [[ "$GROUP_LEVEL_PREPROC" == "yes" ]]; then
 
 fi
 
-# SUBJECT LEVEL STATISTICS
+# SUBJECT LEVEL STATISTICS (AND RESTING STATE POST-PROCESSING)
 if [[ "$SUBJ_LEVEL_STATS" == "yes" ]]; then
 
 	# Set DATA_ARR
@@ -332,16 +341,29 @@ if [[ "$SUBJ_LEVEL_STATS" == "yes" ]]; then
 		fi
 
 		# MERGE RESIDUALS
-		if [[ ${LVL1_MERGE_RES} == "yes" ]]; then
+		if [[ ${LVL1_MERGE_RESIDUALS} == "yes" ]]; then
 
 			echo "Working on ${subj} level 1 merge residuals."
-			
+			run_end=0
+			for ((run=0; run<${#NVOLS_RUN[@]}; run++ )); do
+				run_stt=$(( run_end + 1 ))
+				run_end=$(( run_end + ${NVOLS_RUN[run]} ))
+				input_files=$(seq -f "${LVL1_RESIDUALS_FILENAME_PREFIX}%04g.nii" $run_stt $run_end)
+				fslmerge -tr "residuals_epi$(( run + 1 )).nii.gz" $input_files ${EPI_TR}
+				fslmaths "residuals_epi$(( run + 1 )).nii.gz" -nan "residuals_epi$(( run + 1 )).nii.gz" # Set NaN to 0
+			done
 			echo "${subj} level 1 merge residuals done."
 		fi
 
-		# DETREND
+		# DETREND AND BANDPASS FILTER
+		if [[ ${LVL1_DETREND_BANDPASS_RESIDUALS} == "yes" ]]; then
 
-		# BANDPASS FILTER
+			echo "Working on ${subj} level 1 detrend and bandpass filter residuals."
+			for ((run=0; run<${#NVOLS_RUN[@]}; run++ )); do
+				3dTproject -input "residuals_epi$(( run + 1 )).nii.gz"  -prefix "bpd_residuals_epi$(( run + 1 )).nii.gz"  -polort 1 -passband ${LVL1_RESIDUALS_LOW_F} ${LVL1_RESIDUALS_HIGH_F} -dt ${EPI_TR}
+			done
+			echo "${subj} level 1 detrend and bandpass filter residuals done."
+		fi
 
 	done
 fi

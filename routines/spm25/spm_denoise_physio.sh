@@ -6,7 +6,7 @@
 # Submodule parameters for log_files, cardiac) are currently left at default in this 
 # version (i.e., ignored).
 #
-# Usage: spm_denoise_physio output_dir inputdat tr refslice slice_to_slice wm_mask csf_mask mask_threshold regdat mbfn
+# Usage: spm_denoise_physio output_dir inputdat tr refslice slice_to_slice wm_mask csf_mask mask_threshold regdat censor censor_threshold mbfn
 #
 # output_dir - Directory for outputs.
 # inputdat - Singular image, or text filename
@@ -18,6 +18,8 @@
 # csf_mask - CSF segmentation mask nii volume.
 # mask_threshold - Threshold ratio for mask tissue probability inclusion.
 # regdat - Text filename with fullpaths to rp*_.txt per row per EPI.
+# censor - Censor method ( FD | None )
+# censor_threshold - Censor method threshold (e.g. if FD, 0.5 (mm))
 # mbfn - Matlab batch base output file name.
 #
 # 20251231 Created by Josh Goh.
@@ -32,7 +34,9 @@ wm_mask=${6}
 csf_mask=${7}
 mask_threshold=${8}
 regdat=${9}
-mbfn=${10}
+censor=${10}
+censor_threshold=${11}
+mbfn=${12}
 
 # Call matlab with input script
 unset DISPLAY
@@ -97,8 +101,8 @@ matlab -nosplash > matlab.out << EOF
         matlabbatch{1}.spm.tools.physio.model.noise_rois.yes.n_components = 5;
         matlabbatch{1}.spm.tools.physio.model.movement.yes.file_realignment_parameters = {deblank(REG{r})};
         matlabbatch{1}.spm.tools.physio.model.movement.yes.order = 24;
-        matlabbatch{1}.spm.tools.physio.model.movement.yes.censoring_method = 'FD';
-        matlabbatch{1}.spm.tools.physio.model.movement.yes.censoring_threshold = 0.5;
+        matlabbatch{1}.spm.tools.physio.model.movement.yes.censoring_method = '${censor}';
+        matlabbatch{1}.spm.tools.physio.model.movement.yes.censoring_threshold = ${censor_threshold};
         matlabbatch{1}.spm.tools.physio.model.other.no = struct([]);
         matlabbatch{1}.spm.tools.physio.verbose.level = 1;
         matlabbatch{1}.spm.tools.physio.verbose.fig_output_file = '';
