@@ -72,6 +72,7 @@ LVL1_SPEC="no"
 LVL1_EST="no"
 LVL1_CON="no"
 LVL1_MERGE_RESISDUALS="no"
+LVL1_DETREND_BANDPASS_RESIDUALS="no"
 
 GROUP_LEVEL_STATS="no"
 LVL2_SPEC="no"
@@ -136,7 +137,7 @@ if [[ "$SUBJ_LEVEL_PREPROC" == "yes" ]]; then
 		if [[ "${INHOMOGENEITY_CORRECTION}" == "yes" ]]; then
 			echo "Working on ${subj} inhomogeneity correction."
 
-			
+
 
 			echo "${subj} inhomogeneity correction done."
 		fi
