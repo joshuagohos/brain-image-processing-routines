@@ -144,9 +144,9 @@ sudo chmod +x /etc/profile.d/freesurfer.sh
 
 ## INSTALLATION OF ROUTINES, SYMBOLIC LINKS, AND PIPELINES 
 **Ubuntu, CentOS (Linux)**
-1. Download this repository to your local path (e.g. /home/user)
+1. Download this repository to your local home path Downloads folder (e.g. /home/user/Downloads)
 ```
-cd ~
+cd ~/Downloads
 wget https://github.com/joshuagohos/brain-image-processing-routines/archive/refs/heads/main.zip
 ```
 
@@ -169,15 +169,15 @@ brain-image-processing-routines
 
 3. Copy the routines folder to /opt/brain-image-processing-routines/ and make executable.
 ```
-sudo mkdir -p /opt/brain-image-processing-routines
-sudo cp -rf brain-image-processing-routines/routines /opt/brain-processing-routines/
+sudo mv ~/Downloads/brain-image-processing-routines-main ~/Downloads/brain-image-processing-routines
+sudo cp -rf ~/Downloads/brain-image-processing-routines /opt/
 sudo chmod -R +x /opt/brain-image-processing-routines/routines/*
 ```
 
 4. Make read/write/executable and copy (using rsync) the contents (symbolic links) of the bin folder to /usr/local/bin/.
 ```
-sudo chmod +rwx brain-image-processing-routines/bin/*
-sudo rsync -azvh brain-image-processing-routines/bin/* /usr/local/bin/
+sudo chmod +rwx /opt/brain-image-processing-routines/bin/*
+sudo rsync -azvh /opt/brain-image-processing-routines/bin/* /usr/local/bin/
 ```
 
 # Usage
