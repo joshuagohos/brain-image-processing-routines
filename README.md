@@ -92,16 +92,20 @@ sudo curl -O https://afni.nimh.nih.gov/pub/dist/tgz/linux_ubuntu_24_64.tgz
 sudo tar -xvzf linux_ubuntu_24_64.tgz
 sudo rm linux_ubuntu_24_64.tgz
 sudo mv /usr/local/afni/linux_ubuntu_24_64 /usr/local/afni/abin
-sudo bash -c 'echo "#!/bin/sh" >> /etc/profile.d/afni.sh'
-sudo bash -c 'echo "# Set AFNI system-wide path" >> /etc/profile.d/afni.sh'
-sudo bash -c 'echo "export AFNI_DIR=/usr/local/afni" >> /etc/profile.d/afni.sh'
-sudo bash -c 'echo "export AFNI_PLUGINPATH=/usr/local/afni/abin" >> /etc/profile.d/afni.sh'
-sudo bash -c 'echo "export PATH=/usr/local/afni/abin:${PATH}" >> /etc/profile.d/afni.sh'
-sudo bash -c 'echo "#!/bin/csh" >> /etc/profile.d/afni.csh'
-sudo bash -c 'echo "# Set AFNI system-wide path" >> /etc/profile.d/afni.csh'
-sudo bash -c 'echo "setenv AFNI_DIR /usr/local/afni" >> /etc/profile.d/afni.csh'
-sudo bash -c 'echo "setenv AFNI_PLUGINPATH /usr/local/afni/abin" >> /etc/profile.d/afni.csh'
-sudo bash -c 'echo "set path = ( /usr/local/afni/abin $path )" >> /etc/profile.d/afni.csh'
+cat << 'EOF' | sudo tee /etc/profile.d/afni.sh
+#!/bin/sh
+# Set AFNI system-wide path
+export AFNI_DIR=/usr/local/afni
+export AFNI_PLUGINPATH=/usr/local/afni/abin
+export PATH=${AFNI_DIR}/abin:${PATH}
+EOF
+cat << 'EOF' | sudo tee /etc/profile.d/afni.csh
+#!/bin/csh
+# Set AFNI system-wide path
+setenv AFNI_DIR /usr/local/afni
+setenv AFNI_PLUGINPATH /usr/local/afni/abin
+set path = ( /usr/local/afni/abin $path )
+EOF
 sudo chmod +x /etc/profile.d/afni.sh
 sudo chmod +x /etc/profile.d/afni.csh
 cd /usr/local/afni/abin
