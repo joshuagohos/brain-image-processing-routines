@@ -1,36 +1,46 @@
 #!/bin/bash
 #
-# Setup (with option to run) SPM25 apply bias field image (B) onto image data (P) 
+# Use SPM25 and apply bias field image (B) onto image data (P) 
 # using shell script invoking matlab.
 #
 # Usage: spm_apply_bias_field_image B P
 #
 # B - String of bias field image nifti filepath + filename.
-# P - String array of image data to apply B onto (filepath(s) + filename(s)).
+# P - Singular image (.nii) fullpath or text filename with fullpaths
+#            per row per image.
 #
 # Created by JG 20191016
-# Help updated by JG 20250513.
+# Help updated by JG 20250513. 
 # Updated 20260320 by JG. Modified for pipeline.
 
 # Assign parameters
+B=${1}
+P=${2}
+mbfn=${3}
+rf=${4}
 
 # Call matlab with input script
 unset DISPLAY
 matlab -nosplash > matlab.out << EOF
-
-    if nargin < 2
-        error('Specify input files');
+    settings
+    [p n e] = fileparts('${P}');
+    if strcmp(e,'.nii'),
+        nrun = 1;
+	    S = {'${P}'};
+    else
+	    S = textread('${P}','%s');
+	    nrun = size(S,1);
     end
+    for r = 1:nrun,
+        ni = niftiinfo(S{r});
+        nvols = ni.ImageSize(4);
+        for t = 1:nvols,
+        temp(t).epivol = [deblank(S{r}) ',' num2str(t)];
+        end;
+        matlabbatch{1,1}.spm.spatial.realign.estwrite.data{1,r} = cellstr(strvcat(temp.epivol));
+    end;
 
-    if ~iscell(B)
-        B = cellstr(B);
-    end
-
-    if ~iscell(P)
-        P = cellstr(P);
-    end
-
-    VB = spm_vol(B);
+    VB = spm_vol('${B}');
     if length(VB) > 1
         error('Biased image should have only one.')
     end
