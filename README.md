@@ -199,3 +199,6 @@ cd /path/to/project/brain-image-processing-routines/pipelines
 ./pipeline.sh
 ```
 
+# Changelog
+- 20260322: Josh Goh implemented this changelog. Updated pipeline with AFNI inhomogeneity correction.
+- 20260321: Josh Goh updated spm_segment.sh with output selection options.

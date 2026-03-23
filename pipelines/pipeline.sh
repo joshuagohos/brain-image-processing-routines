@@ -21,6 +21,8 @@ SLICE_TIME_TIME_ACQUISITION="eval('tr-(tr/nslices)')" # If SLICE_TIME_SLICE_ORDE
 SLICE_TO_SLICE="eval('tr/nslices')"
 COREG_OTHER=0
 SEGMENT_AFF_REG=mni # Alt: mni | eastern | subj | none | 0 
+SEGMENT_SAVE_OUTPUTS_BIAS_FIELD=("1" "0" "0" "0" "0" "0" "0" "0") # INUfield,INUcorrected,native,nativeimport,mod,unmod,inv,fw
+SEGMENT_SAVE_OUTPUTS=("1" "1" "1" "1" "1" "1" "1" "1") # INUfield,INUcorrected,native,nativeimport,mod,unmod,inv,fw
 DENOISE_MASK_THRESHOLD=0.95
 DENOISE_CENSOR_METHOD=None # Alt: None | FD
 DENOISE_CENSOR_THRESHOLD=0.5 # If FD, 0.5 mm
@@ -133,15 +135,6 @@ if [[ "$SUBJ_LEVEL_PREPROC" == "yes" ]]; then
 		cd ${DERIVATIVES_DIR}/${subj}/nii
 		EPI_DATA_LIST=${DERIVATIVES_DIR}/${subj}/nii/EPI_DATA_LIST.txt
 
-		# Inhomogeneity correction
-		if [[ "${INHOMOGENEITY_CORRECTION}" == "yes" ]]; then
-			echo "Working on ${subj} inhomogeneity correction."
-
-
-
-			echo "${subj} inhomogeneity correction done."
-		fi
-
 		# Realign and reslice EPI files
 		if [[ "${REALIGN_RESLICE}" == "yes" ]]; then
 			echo "Working on ${subj} realignment and reslicing."
@@ -149,6 +142,18 @@ if [[ "$SUBJ_LEVEL_PREPROC" == "yes" ]]; then
 			spm_realign_reslice ${EPI_DATA_LIST} ${REALIGN_TO_MEAN} ${subj}_spm_realign_reslice 1
 			rm -rf ${EPI_DATA_LIST}
 			echo "${subj} realign and reslice done."
+		fi
+
+		# Inhomogeneity correction
+		if [[ "${INHOMOGENEITY_CORRECTION}" == "yes" ]]; then
+			echo "Working on ${subj} inhomogeneity correction."
+			MEAN_EPI_DATA_VOL=$(ls -1 ${DERIVATIVES_DIR}/${subj}/nii/mean${EPI_FILENAME_GLOB}.nii)
+			spm_segment ${MEAN_EPI_DATA_VOL} ${SEGMENT_AFF_REG} ${SEGMENT_SAVE_OUTPUTS_BIAS_FIELD} ${subj}_spm_segment_bias_field 1
+			echo "${subj} inhomogeneity correction - mean EPI segmentation done."
+			for ((run=0; run<${#NVOLS_RUN[@]}; run++ )); do
+				3dcalc -a EPI_(( run + 1))_filename.nii -b BIAS_FIELD_VOL.nii -expr 'a*b' -prefix bEPI_(( run + 1))_filename.nii
+			done
+			echo "${subj} inhomogeneity correction done."
 		fi
 
 		# Slice-time correct realigned-resliced EPI files
@@ -180,7 +185,7 @@ if [[ "$SUBJ_LEVEL_PREPROC" == "yes" ]]; then
 		# Segment T2-EPI-coregistered T1
 		if [[ "${SEGMENT_T1}" == "yes" ]]; then
 			echo "Working on ${subj} T1 segmentation."
-			spm_segment ${T1_DATA_VOL} ${SEGMENT_AFF_REG} ${subj}_spm_segment 1
+			spm_segment ${T1_DATA_VOL} ${SEGMENT_AFF_REG} ${SEGMENT_SAVE_OUTPUTS} ${subj}_spm_segment_T1 1
 			echo "${subj} T1 segmentation done."
 		fi
 
