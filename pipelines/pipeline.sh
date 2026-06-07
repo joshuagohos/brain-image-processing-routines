@@ -151,7 +151,7 @@ if [[ "$SUBJ_LEVEL_PREPROC" == "yes" ]]; then
 			spm_segment ${MEAN_EPI_DATA_VOL} ${SEGMENT_AFF_REG} ${SEGMENT_SAVE_OUTPUTS_BIAS_FIELD} ${subj}_spm_segment_bias_field 1
 			echo "${subj} inhomogeneity correction - mean EPI segmentation done."
 			for ((run=0; run<${#NVOLS_RUN[@]}; run++ )); do
-				3dcalc -a EPI_(( run + 1))_filename.nii -b BIAS_FIELD_VOL.nii -expr 'a*b' -prefix bEPI_(( run + 1))_filename.nii
+				3dcalc -a "EPI_$(( run + 1 ))_filename.nii" -b "BIAS_FIELD_VOL.nii" -expr 'a*b' -prefix "bEPI_$(( run + 1 ))_filename.nii"
 			done
 			echo "${subj} inhomogeneity correction done."
 		fi
